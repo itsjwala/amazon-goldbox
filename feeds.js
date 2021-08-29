@@ -1,5 +1,4 @@
 const { putObject, copyObject } = require('./lib/aws');
-const { respondToSuccess, respondToError } = require('./lib/lambda');
 const Util = require('./lib/util');
 
 const FeedAmazonGoldbox = require('./feeds/feed-amazon-goldbox');
@@ -25,17 +24,14 @@ module.exports.feeds = function(event, context) {
       CacheControl: 'max-age=0'
     }))
     .then(rss_feed => copyObject(ACTIVE_PATH, FEEDS_PATH))
-    .then(data => respondToSuccess({
-      label: PROCESS_LABEL,
-      data,
-      event,
-    }))
-    .catch(error => respondToError({
-      label: PROCESS_LABEL,
-      data: error,
-      event,
-      message: 'Error building feeds.',
-    }));
+    .then(_ => {
+      console.log(`${PROCESS_LABEL} - Success`);
+      context.succeed()
+    })
+    .catch(error => {
+      console.log(`${PROCESS_LABEL} - Error: ${error.toString()}`);
+      context.fail()
+    })
 
 }
 
@@ -53,7 +49,7 @@ function processFeeds(data) {
 
   // If we have blacklist items in our config, filter
 
-  products.filter(product => product && !product.isBlacklisted());
+  products = products.filter(product => product && !product.isBlacklisted());
 
   // Cut it down to the most recent 400 after we remove the blacklisted items
 
@@ -73,9 +69,9 @@ function processFeeds(data) {
 
 function buildRssFeed(products) {
   return {
-    title: 'GMCS Deals Feed',
-    link: 'https://givemecheapstuff.com',
-    description: 'GMCS Deals Feed',
+    title: 'FMD Deals Feed',
+    link: 'https://findmydeals.tech',
+    description: 'FMD Deals Feed',
     last_build_date: Util.rssDate(),
     items: products,
   };

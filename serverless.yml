@@ -5,7 +5,7 @@ service: amazon-goldbox
 provider:
   name: aws
   runtime: nodejs14.x
-  region: us-east-1
+  region: ap-south-1
   stage: production
   environment:
     service: ${self:service}
@@ -17,10 +17,12 @@ provider:
     blacklist_path: ${self:custom.blacklist_path, ''}
     hashtags_path: ${self:custom.hashtags_path, ''}
     accounts_path: ${self:custom.accounts_path, ''}
+    default_image_link: ${self:custom.default_image_link, ''}
   iamRoleStatements:
     - Effect: Allow
       Action:
         - s3:PutObject
+        - s3:GetObject
       Resource: "arn:aws:s3:::${self:provider.environment.bucket}/*"
 
 functions:
@@ -33,11 +35,11 @@ functions:
     events:
       - schedule: cron(0/20 * * * ? *)
     environment:
-      GMCS_TWEET_APP_SECRET: ${ssm:GMCS_TWEET_APP_SECRET}
-      GMCS_TWITTER_CONSUMER_KEY: ${ssm:GMCS_TWITTER_CONSUMER_KEY}
-      GMCS_TWITTER_CONSUMER_SECRET: ${ssm:GMCS_TWITTER_CONSUMER_SECRET}
-      GMCS_TWITTER_ACCESS_TOKEN_KEY: ${ssm:GMCS_TWITTER_ACCESS_TOKEN_KEY}
-      GMCS_TWITTER_ACCESS_TOKEN_SECRET: ${ssm:GMCS_TWITTER_ACCESS_TOKEN_SECRET}
+      FMD_TWEET_APP_SECRET: ${self:custom.FMD_TWEET_APP_SECRET}
+      FMD_TWITTER_CONSUMER_KEY: ${self:custom.FMD_TWITTER_CONSUMER_KEY}
+      FMD_TWITTER_CONSUMER_SECRET: ${self:custom.FMD_TWITTER_CONSUMER_SECRET}
+      FMD_TWITTER_ACCESS_TOKEN_KEY: ${self:custom.FMD_TWITTER_ACCESS_TOKEN_KEY}
+      FMD_TWITTER_ACCESS_TOKEN_SECRET: ${self:custom.FMD_TWITTER_ACCESS_TOKEN_SECRET}
 
 plugins:
   - serverless-offline

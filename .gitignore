@@ -40,6 +40,5 @@ admin.env
 .env
 _meta
 .serverless
-env.yml
 
 config
