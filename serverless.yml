@@ -29,7 +29,7 @@ functions:
   feeds:
     handler: feeds.feeds
     events:
-      - schedule: cron(50 9 * * ? *)
+      - schedule: cron(30 18 * * ? *)
   rss:
     handler: rss.rss
     events:
@@ -40,6 +40,9 @@ functions:
       FMD_TWITTER_CONSUMER_SECRET: ${self:custom.FMD_TWITTER_CONSUMER_SECRET}
       FMD_TWITTER_ACCESS_TOKEN_KEY: ${self:custom.FMD_TWITTER_ACCESS_TOKEN_KEY}
       FMD_TWITTER_ACCESS_TOKEN_SECRET: ${self:custom.FMD_TWITTER_ACCESS_TOKEN_SECRET}
+      TELEGRAM_BOT_TOKEN: ${self:custom.TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHANNEL_ID: ${self:custom.TELEGRAM_CHANNEL_ID}
+
 
 plugins:
   - serverless-offline

@@ -10,7 +10,7 @@ const PROCESS_LABEL = '[SSE] Build';
 const FEEDS_PATH = process.env.feeds_path;
 const ACTIVE_PATH = process.env.active_path;
 
-module.exports.rss = function(event, context) {
+module.exports.rss = function (event, context) {
 
   getActiveFeed()
     .then(checkItemsStatus)
@@ -79,7 +79,7 @@ function checkItemsStatus(data) {
 
   console.log(`${PROCESS_LABEL} - Checking items status`);
 
-  if ( Array.isArray(data.items) && data.items.length > 0 ) {
+  if (Array.isArray(data.items) && data.items.length > 0) {
     console.log(`${PROCESS_LABEL} - Found items`);
     return data;
   }
@@ -117,7 +117,7 @@ async function getNewFeedItemAndSave(data) {
   let response;
 
   Object.keys(new_item).forEach(key => {
-    if ( typeof new_item[key] !== 'undefined') {
+    if (typeof new_item[key] !== 'undefined') {
       payload[key] = new_item[key];
     }
   });
@@ -142,6 +142,35 @@ async function getNewFeedItemAndSave(data) {
     console.log(`${PROCESS_LABEL} - [TWITTER][TWEET] Error: ${response.statusText}`);
     throw new Error(`Failed to tweet: ${response.statusText}`);
   }
+
+  try {
+    let url = new URL(new_item.link)
+    url.hostname = "findmydeals.tech"
+    url.pathname = "/amazon" + url.pathname
+  
+    let caption = `
+    ${new_item.title} 
+
+    <a href="${url.toString()}"> https://amazon.in/dealoftheday </a>
+    `
+
+    let telegramURL = `https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendPhoto?chat_id=${process.env.TELEGRAM_CHANNEL_ID}&photo=${new_item.image}&parse_mode=HTML&caption=${encodeURIComponent(caption)}`
+    console.log(telegramURL)
+    response = await fetch(telegramURL)
+    console.log(await response.json())
+  } catch (e) {
+    console.log(`${PROCESS_LABEL} - [TELEGRAM][POST] Error: ${JSON.stringify(e)}`);
+    // throw e;
+  }
+
+
+  if ( response.status === 200 ) {
+    console.log(`${PROCESS_LABEL} - [TELEGRAM][POST] Success`);
+  } else {
+    console.log(`${PROCESS_LABEL} - [TELEGRAM][POST] Error: ${response.statusText}`);
+    // throw new Error(`Failed to post to telegram: ${response.statusText}`);
+  }
+
 
   try {
     await putObject(ACTIVE_PATH, JSON.stringify(data), {
