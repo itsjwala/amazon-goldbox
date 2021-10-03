@@ -10,7 +10,8 @@ class FeedAmazonGoldbox extends Feed {
 
     this.title = 'Amazon Goldbox';
     this.id = 'feed-amazon-goldbox';
-    this.feed_url = 'https://amazon.in/gp/goldbox';
+    // this.feed_url = 'https://amazon.in/gp/goldbox';
+    this.feed_url = 'https://www.amazon.in/events/greatindianfestival';
 
   }
 
